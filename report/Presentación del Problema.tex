@@ -1,3 +1,99 @@
 % !TEX root = main.tex
 \section{Presentación del problema}
-La aseguradora Corredores Argentinos S.A. se dispone a 
+La aseguradora Corredores Argentinos S.A. se dispone a crear un programa de formación para sus empleados, con el objetivo de mejorar sus competencias en el área de seguros y gestión comercial. Para ello, se ha diseñado un calendario académico que contempla la asignación de materias, profesores y cohortes, respetando las correlatividades y restricciones logísticas propias de la organización.
+
+A continuación se detallan los elementos principales del problema:
+
+\subsection*{Materias}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+	extbf{Materias} \\
+\hline
+Intro a Seguros \\
+Matemática Actuarial \\
+Riesgos \\
+Legislación \\
+Seguros de Vida \\
+Seguros Generales \\
+Gestión Comercial \\
+Reaseguros \\
+\hline
+\end{tabular}
+\caption{Listado de materias del programa}
+\end{table}
+
+\subsection*{Profesores}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+	–extbf{Profesores} \\
+\hline
+Prof. A \\
+Prof. B \\
+Prof. C \\
+Prof. D \\
+\hline
+\end{tabular}
+\caption{Profesores asignados al programa}
+\end{table}
+
+\subsection*{Asignación de profesores a materias}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+	extbf{Materia} & \textbf{Profesor} \\
+\hline
+Intro a Seguros & Prof. A \\
+Matemática Actuarial & Prof. B \\
+Riesgos & Prof. C \\
+Legislación & Prof. D \\
+Seguros de Vida & Prof. A \\
+Seguros Generales & Prof. B \\
+Gestión Comercial & Prof. C \\
+Reaseguros & Prof. D \\
+\hline
+\end{tabular}
+\caption{Asignación fija de profesores a materias}
+\end{table}
+
+\subsection*{Cohortes}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|}
+\hline
+	extbf{Cohortes} \\
+\hline
+C1 \\
+C2 \\
+C3 \\
+C4 \\
+C5 \\
+\hline
+\end{tabular}
+\caption{Cohortes de empleados participantes}
+\end{table}
+
+\subsection*{Correlatividades}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+	extbf{Materia} & \textbf{Correlativa} \\
+\hline
+Matemática Actuarial & Intro a Seguros \\
+Riesgos & Matemática Actuarial \\
+Legislación & Intro a Seguros \\
+Seguros de Vida & Riesgos \\
+Seguros Generales & Legislación \\
+Gestión Comercial & Seguros Generales \\
+Reaseguros & Seguros de Vida \\
+\hline
+\end{tabular}
+\caption{Correlatividades entre materias}
+\end{table}
+
+El objetivo es construir un calendario óptimo que asigne las materias a los distintos cuatrimestres, días y turnos, respetando las correlatividades, la disponibilidad de profesores y las restricciones logísticas, como la cantidad máxima de clases por día y la prohibición de ciertos bloques horarios.
