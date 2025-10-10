@@ -1,6 +1,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import pandas as pd
 import pyswarms as ps
 from logger_config import logger
@@ -221,15 +222,17 @@ logger.info(f'Optimization finished. Best cost: {cost}')
 convergencia = optimizer.cost_history
 best_x = pos
 
+# Mejorar look and feel con seaborn
+sns.set_theme(style="whitegrid")
 # Mostrar convergencia
 if print_image_result:
 	logger.info('Plotting and saving convergence image')
 	fig_conv, ax_conv = plt.subplots(figsize=(8,4))
-	ax_conv.plot(convergencia)
-	ax_conv.set_title('Convergencia PSO (pyswarms)')
-	ax_conv.set_xlabel('Iteración')
-	ax_conv.set_ylabel('Penalidad')
-	ax_conv.grid()
+	sns.lineplot(x=range(len(convergencia)), y=convergencia, ax=ax_conv, color="royalblue", linewidth=2)
+	ax_conv.set_title('Convergencia PSO (pyswarms)', fontsize=18, fontweight='bold')
+	ax_conv.set_xlabel('Iteración', fontsize=14)
+	ax_conv.set_ylabel('Penalidad', fontsize=14)
+	ax_conv.grid(True, linestyle='--', alpha=0.7)
 	plt.tight_layout()
 	plt.savefig('output_imgs/convergencia_pso.png', dpi=200)
 	plt.show()
@@ -278,13 +281,13 @@ if print_image_result:
 			cell.set_height(0.18)
 			cell.set_linewidth(2)
 			if row == 0 or col == -1:
-				cell.set_facecolor('#dbeafe')
+				cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.2))
 				cell.set_text_props(va='top', ha='left', fontsize=16)
 			elif (row+col)%2 == 0:
-				cell.set_facecolor('#f1f5f9')
+				cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.1))
 				cell.set_text_props(va='top', ha='left', fontsize=11)
 			else:
-				cell.set_facecolor('#e0e7ef')
+				cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.05))
 				cell.set_text_props(va='top', ha='left', fontsize=11)
 		plt.title(f'Calendario Consolidado - Semestre {semester_idx+1}', fontsize=22, fontweight='bold')
 		plt.tight_layout()
@@ -326,13 +329,13 @@ if print_image_result:
 					cell.set_height(0.18)
 					cell.set_linewidth(2)
 					if row == 0 or col == -1:
-						cell.set_facecolor('#dbeafe')
+						cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.2))
 						cell.set_text_props(va='top', ha='left', fontsize=16)
 					elif (row+col)%2 == 0:
-						cell.set_facecolor('#f1f5f9')
+						cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.1))
 						cell.set_text_props(va='top', ha='left', fontsize=11)
 					else:
-						cell.set_facecolor('#e0e7ef')
+						cell.set_facecolor(sns.color_palette("Blues", as_cmap=True)(0.05))
 						cell.set_text_props(va='top', ha='left', fontsize=11)
 				plt.title(f'Calendar {cohort} - Year {year} - Semester {local_semester+1}', fontsize=20, fontweight='bold')
 				plt.tight_layout()
