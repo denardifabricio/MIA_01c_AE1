@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+numpy
+seaborn
+pandas
+pyswarms
+python-multipart
+pydantic

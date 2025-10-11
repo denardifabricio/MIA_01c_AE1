@@ -1,0 +1,8 @@
+streamlit
+streamlit-calendar
+matplotlib
+numpy
+seaborn
+pandas
+pyswarms
+pydantic
