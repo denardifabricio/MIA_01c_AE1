@@ -1,0 +1,82 @@
+{
+  "subjects": [
+    "Intro a Seguros",
+    "Matemática Actuarial",
+    "Riesgos",
+    "Legislación",
+    "Seguros de Vida",
+    "Seguros Generales",
+    "Gestión Comercial",
+    "Reaseguros"
+  ],
+  "professors": [
+    "Prof. A",
+    "Prof. B",
+    "Prof. C",
+    "Prof. D"
+  ],
+  "cohorts": [
+    "Cohorte1",
+    "Cohorte2",
+    "Cohorte3",
+    "Cohorte4",
+    "Cohorte5"
+  ],
+  "week_days": [
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes"
+  ],
+  "professor_by_subject": [
+    ["Intro a Seguros", "Prof. A"],
+    ["Intro a Seguros", "Prof. B"],
+    ["Matemática Actuarial", "Prof. B"],
+    ["Matemática Actuarial", "Prof. C"],
+    ["Riesgos", "Prof. C"],
+    ["Riesgos", "Prof. D"],
+    ["Legislación", "Prof. D"],
+    ["Seguros de Vida", "Prof. A"],
+    ["Seguros Generales", "Prof. B"],
+    ["Gestión Comercial", "Prof. C"],
+    ["Reaseguros", "Prof. D"]
+  ],
+  "prerequisites": [
+    ["Matemática Actuarial", "Intro a Seguros"],
+    ["Riesgos", "Matemática Actuarial"],
+    ["Legislación", "Intro a Seguros"],
+    ["Seguros de Vida", "Riesgos"],
+    ["Seguros Generales", "Legislación"],
+    ["Gestión Comercial", "Seguros Generales"],
+    ["Reaseguros", "Seguros de Vida"]
+  ],
+  "shifts": ["Mañana", "Tarde"],
+  "blocked_slots": [
+    ["Viernes", "Tarde"],
+    ["Lunes", "Mañana"]
+  ],
+  "num_years": 2,
+  "semesters_per_year": 2,
+  "start_year": 2026,
+  "max_classes_per_week": 2,
+  "max_subjects_per_day_professor": 2,
+  "max_subjects_per_day_cohort": 2,
+  "pso_options": {
+    "c1": 1.5,
+    "c2": 1.5,
+    "w": 0.7
+  },
+  "n_particles": 60,
+  "max_iters": 200,
+  "penalty_weights": {
+    "semester_distribution": 1000000,
+    "prerequisites": 5000,
+    "blocked_slots": 10000,
+    "professor_overload": 100,
+    "cohort_overload": 200,
+    "slot_conflicts": 500,
+    "day_balance": 50,
+    "shift_usage": 100
+  }
+}
