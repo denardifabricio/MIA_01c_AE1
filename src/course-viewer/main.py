@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit_calendar as st_calendar
 from datetime import datetime
 import logging
 import requests
@@ -8,7 +7,35 @@ import pandas as pd
 import json
 
 from model.course_request import CourseRequest
+import numpy as np
 
+# Sidebar descriptivo
+st.sidebar.title("Descripción")
+st.sidebar.markdown(
+    """
+   
+# Maestría en Inteligencia Artificial
+
+## Trabajo práctico final
+
+### Algoritmos Evolutivos I
+
+**Autores:**  
+Esp. Ing. Fabricio Denardi  
+Esp. Ing. Bruno  Masoller   
+Esp. Lic. Noelia Qualindi  
+
+**Docente:** 
+Esp. Ing. Miguel Augusto Azar  
+
+Esta aplicación permite generar y visualizar el calendario académico para el armado de un curso utilizando algoritmos evolutivos.
+    
+En el panel principal puedes configurar los parámetros y generar el calendario optimizado para cada cohorte y cuatrimestre.
+
+
+Ciudad de Buenos Aires, Argentina 2025
+    """
+)
 # Cargar configuración de ejemplo desde JSON
 with open(os.path.join(os.path.dirname(__file__), "config_example.json"), encoding="utf-8") as f:
     config_example = json.load(f)
@@ -28,18 +55,8 @@ st.set_page_config(page_title="Calendario", layout="wide")
 st.title("Calendario Interactivo")
 
 
-calendar_options = {
-    "initialView": "dayGridMonth",
-    "headerToolbar": {
-        "left": "prev,next today",
-        "center": "title",
-        "right": "dayGridMonth,timeGridWeek,timeGridDay"
-    },
-}
-
-
 # Formulario de configuración inicial
-st.title("Configuración Inicial del Calendario de Seguros")
+st.subheader("Configuración Inicial del Calendario del curso")
 
 
 with st.form("config_form"):
@@ -193,6 +210,7 @@ if submitted:
                     ax_conv.set_title('Convergencia PSO (pyswarms)', fontsize=18, fontweight='bold')
                     ax_conv.set_xlabel('Iteración', fontsize=14)
                     ax_conv.set_ylabel('Penalidad', fontsize=14)
+                    ax_conv.plot(np.array(convergence), marker='', color='blue', linewidth=2)
                     ax_conv.grid(True, linestyle='--', alpha=0.7)
                     st.pyplot(fig_conv)
                 else:
