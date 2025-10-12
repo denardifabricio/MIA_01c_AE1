@@ -41,7 +41,6 @@ El proyecto está dividido en dos componentes principales:
 MIA_01c_AE1/
 ├── README.MD                           # Este archivo
 ├── docker-compose.yml                  # Configuración de Docker Compose
-├── insurance_course_calendar copy.py   # Script legacy (copia de respaldo)
 ├── report.log                          # Logs de ejecución
 │
 ├── src/                                # Código fuente principal

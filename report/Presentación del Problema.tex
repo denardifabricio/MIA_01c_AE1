@@ -4,6 +4,13 @@ La aseguradora Corredores Argentinos S.A. se dispone a crear un programa de form
 
 A continuación se detallan los elementos principales del problema:
 
+\subsection*{Repositorio del proyecto}
+El código fuente completo de este proyecto, incluyendo la implementación del algoritmo de optimización, se encuentra disponible en el repositorio de GitHub:
+
+\texttt{https://github.com/denardifabricio/MIA\_01c\_AE1}
+
+Este repositorio contiene todos los archivos necesarios para ejecutar el proyecto, incluyendo los datos de entrada, la implementación del algoritmo PSO, y los scripts para generar los calendarios y visualizaciones.
+
 \subsection*{Materias}
 \begin{table}[ht]
 \centering
@@ -97,3 +104,118 @@ Reaseguros & Seguros de Vida \\
 \end{table}
 
 El objetivo es construir un calendario óptimo que asigne las materias a los distintos cuatrimestres, días y turnos, respetando las correlatividades, la disponibilidad de profesores y las restricciones logísticas, como la cantidad máxima de clases por día y la prohibición de ciertos bloques horarios.
+
+\subsection{Restricciones del problema}
+El problema de programación de calendarios académicos presenta diversas restricciones que deben ser consideradas para obtener una solución factible y de calidad. Estas restricciones se clasifican en fuertes (hard constraints) y débiles (soft constraints) según su nivel de criticidad:
+
+\subsubsection{Restricciones Fuertes (Hard Constraints)}
+Las restricciones fuertes son aquellas que \textbf{no pueden ser violadas} bajo ninguna circunstancia, ya que comprometen la factibilidad de la solución:
+
+\begin{itemize}
+    \item \textbf{Correlatividades (Prerequisites)}: Las materias deben respetar estrictamente el orden de correlatividades. Una materia no puede ser dictada en un cuatrimestre igual o anterior al de su correlativa.
+    \item \textbf{Conflictos de horarios}: No puede haber solapamiento de horarios para un mismo profesor o cohorte en un mismo día y turno.
+    \item \textbf{Bloques horarios prohibidos}: Ciertos días y turnos están bloqueados y no pueden ser utilizados para dictar clases.
+\end{itemize}
+
+\subsubsection{Restricciones Débiles (Soft Constraints)}
+Las restricciones débiles pueden ser violadas, pero con penalizaciones en la función objetivo que afectan la calidad de la solución:
+
+\begin{itemize}
+    \item \textbf{Distribución equilibrada por cuatrimestre}: Se busca una distribución balanceada de materias entre los diferentes cuatrimestres del programa.
+    \item \textbf{Sobrecarga de profesores}: Los profesores no deberían tener más del máximo permitido de materias por día.
+    \item \textbf{Sobrecarga de cohortes}: Las cohortes no deberían tener más del máximo permitido de materias por día.
+    \item \textbf{Balance en el uso de días}: Se busca un uso equilibrado de todos los días de la semana disponibles.
+    \item \textbf{Uso eficiente de turnos}: Se prefiere el uso de todos los turnos disponibles en cada día.
+\end{itemize}
+
+\subsection{Estructura base del problema - Configuración de ejemplo}
+A continuación se presenta la estructura completa de configuración utilizada como base para el problema, incluyendo todos los parámetros de restricciones:
+
+\subsubsection{Parámetros generales del programa}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Descripción} \\
+\hline
+Duración del programa & 2 años & Extensión total del programa académico \\
+Cuatrimestres por año & 2 & División temporal anual \\
+Año de inicio & 2026 & Primer año de implementación \\
+Clases máximas por semana & 2 & Frecuencia semanal por materia \\
+\hline
+\end{tabular}
+\caption{Configuración temporal del programa}
+\end{table}
+
+\subsubsection{Restricciones de capacidad}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Restricción} & \textbf{Límite} & \textbf{Tipo} \\
+\hline
+Materias por día (profesor) & 2 & Restricción débil \\
+Materias por día (cohorte) & 2 & Restricción débil \\
+\hline
+\end{tabular}
+\caption{Límites de capacidad diaria}
+\end{table}
+
+\subsubsection{Horarios y turnos disponibles}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Días de la semana} & \textbf{Turnos disponibles} \\
+\hline
+Lunes a Viernes & Mañana, Tarde \\
+\hline
+\textbf{Bloques horarios prohibidos} & \\
+\hline
+Viernes Tarde & (No disponible) \\
+Lunes Mañana & (No disponible) \\
+\hline
+\end{tabular}
+\caption{Disponibilidad horaria del programa}
+\end{table}
+
+\subsubsection{Parámetros del algoritmo PSO}
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Parámetro PSO} & \textbf{Valor} & \textbf{Descripción} \\
+\hline
+Número de partículas & 480 & Tamaño del enjambre \\
+Iteraciones máximas & 1000 & Criterio de parada \\
+Factor cognitivo (c1) & 1.5 & Atracción hacia mejor posición personal \\
+Factor social (c2) & 1.5 & Atracción hacia mejor posición global \\
+Inercia (w) & 0.7 & Factor de inercia del movimiento \\
+\hline
+\end{tabular}
+\caption{Configuración del algoritmo de optimización PSO}
+\end{table}
+
+\subsubsection{Pesos de penalización}
+Los pesos de penalización determinan la importancia relativa de cada restricción en la función objetivo:
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{|l|c|l|}
+\hline
+\textbf{Tipo de restricción} & \textbf{Peso} & \textbf{Criticidad} \\
+\hline
+Distribución por cuatrimestre & 20,000 & Alta \\
+Correlatividades & 20,000 & Alta \\
+Bloques horarios prohibidos & 500 & Media \\
+Conflictos de horarios & 500 & Media \\
+Sobrecarga de cohortes & 200 & Baja \\
+Sobrecarga de profesores & 100 & Baja \\
+Uso eficiente de turnos & 100 & Baja \\
+Balance de días & 50 & Muy baja \\
+\hline
+\end{tabular}
+\caption{Pesos de penalización por tipo de restricción}
+\end{table}
+
+Los pesos más altos corresponden a las restricciones más críticas para el funcionamiento del programa académico. La distribución equilibrada por cuatrimestre y el respeto de las correlatividades tienen la máxima prioridad, mientras que aspectos de optimización como el balance de días tienen menor peso relativo.

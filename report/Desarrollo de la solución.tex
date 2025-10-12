@@ -1,2 +1,382 @@
 % !TEX root = MIA_c01_AE1.tex
 \section{Desarrollo de la solución}
+
+La solución implementada utiliza el algoritmo de \textbf{Particle Swarm Optimization (PSO)} para resolver el problema de optimización multiobjetivo de programación de calendarios académicos. El desarrollo se estructura en una arquitectura modular que separa la lógica de optimización del frontend de visualización.
+
+\subsection{Arquitectura del sistema}
+
+El sistema está compuesto por dos componentes principales:
+
+\begin{itemize}
+    \item \textbf{Backend (course-generator)}: API REST desarrollada en FastAPI que implementa el algoritmo PSO
+    \item \textbf{Frontend (course-viewer)}: Interfaz web interactiva desarrollada en Streamlit para configuración y visualización
+\end{itemize}
+
+\subsection{Estructura de archivos y carpetas}
+
+El proyecto está organizado en una estructura modular que facilita el mantenimiento y la escalabilidad:
+
+\begin{verbatim}
+MIA_01c_AE1/
+|-- README.MD                           # Documentacion principal
+|-- docker-compose.yml                  # Configuracion de Docker Compose
+|-- report.log                          # Logs de ejecucion
+|
+|-- src/                                # Codigo fuente principal
+|   |-- course-generator/               # Backend - API de optimizacion
+|   |   |-- Dockerfile                  # Configuracion Docker del backend
+|   |   |-- main.py                     # API FastAPI principal
+|   |   |-- insurance_course_calendar.py # Logica del algoritmo PSO
+|   |   |-- experiment_pso.py           # Experimentos y analisis
+|   |   |-- optimize_penalties.py       # Optimizacion de penalidades
+|   |   |-- test.py                     # Scripts de testing
+|   |   |-- requirements.txt            # Dependencias Python
+|   |   |-- config_example.json         # Configuracion de ejemplo
+|   |   |-- model/                      # Modelos de datos
+|   |   |-- report/                     # Reportes generados
+|   |
+|   |-- course-viewer/                  # Frontend - Interface web
+|       |-- Dockerfile                  # Configuracion Docker del frontend
+|       |-- main.py                     # Aplicacion Streamlit principal
+|       |-- requirements.txt            # Dependencias Python
+|       |-- config_example.json         # Configuracion de ejemplo
+|       |-- model/                      # Modelos compartidos
+|       |-- .streamlit/                 # Configuracion Streamlit
+|       |-- images/                     # Recursos graficos
+|
+|-- lecture/                            # Material academico
+|   |-- ae1_ga_optim_aulas_02.ipynb    # Jupyter notebook con analisis
+|
+|-- report/                             # Documentacion y reportes
+|   |-- MIA_c01_AE1.pdf                # Informe tecnico principal
+|   |-- Conclusiones.tex               # Conclusiones en LaTeX
+|   |-- ...                            # Otros archivos del reporte
+|
+|-- logs/                              # Directorio de logs del sistema
+\end{verbatim}
+
+\subsection{Instalación y configuración}
+
+El sistema está completamente dockerizado para facilitar el despliegue y garantizar la reproducibilidad del entorno de ejecución.
+
+\subsubsection{Prerrequisitos}
+Para ejecutar el sistema se requiere:
+\begin{itemize}
+    \item Docker
+    \item Docker Compose
+\end{itemize}
+
+\subsubsection{Configuración inicial}
+1. \textbf{Clonar el repositorio:}
+\begin{verbatim}
+git clone <repository-url>
+cd MIA_01c_AE1
+\end{verbatim}
+
+2. \textbf{Configurar variables de entorno:}
+Crear un archivo \texttt{.env} en la raíz del proyecto con:
+\begin{verbatim}
+COURSE_GENERATOR_PORT=8000
+COURSE_VIEWER_PORT=8501
+\end{verbatim}
+
+\subsubsection{Ejecución del sistema}
+\textbf{Opción 1: Ejecutar con Docker Compose (Recomendado)}
+\begin{verbatim}
+docker compose up --build
+\end{verbatim}
+
+\textbf{Opción 2: Ejecutar en segundo plano}
+\begin{verbatim}
+docker compose up -d --build
+\end{verbatim}
+
+Una vez ejecutado, la aplicación estará disponible en:
+\begin{itemize}
+    \item \textbf{Frontend (Streamlit)}: \texttt{http://localhost:8501}
+    \item \textbf{Backend API (FastAPI)}: \texttt{http://localhost:8000}
+    \item \textbf{Documentación API}: \texttt{http://localhost:8000/docs}
+\end{itemize}
+
+\subsubsection{Uso del sistema}
+El flujo de trabajo típico para utilizar la aplicación es:
+\begin{enumerate}
+    \item Acceder a la interfaz web en \texttt{http://localhost:8501}
+    \item Configurar parámetros del curso (número de cohortes, materias, restricciones)
+    \item Ejecutar optimización con el algoritmo PSO
+    \item Visualizar resultados en forma de calendarios y gráficos
+    \item Descargar calendarios en formato Excel o PNG
+\end{enumerate}
+
+\subsubsection{Desarrollo local (Sin Docker)}
+Para desarrolladores que prefieran ejecutar sin Docker:
+
+\textbf{Backend:}
+\begin{verbatim}
+cd src/course-generator
+pip install -r requirements.txt
+python main.py
+\end{verbatim}
+
+\textbf{Frontend:}
+\begin{verbatim}
+cd src/course-viewer
+pip install -r requirements.txt
+streamlit run main.py
+\end{verbatim}
+
+Para detener la aplicación:
+\begin{verbatim}
+docker compose down
+\end{verbatim}
+
+\subsection{Representación del problema}
+
+\subsubsection{Codificación de la solución}
+Cada partícula en el enjambre PSO representa una solución completa al problema de programación. La dimensionalidad del vector de posición se calcula como:
+
+$$dimension = num\_subjects \times num\_cohorts \times 4$$
+
+Donde cada grupo de 4 valores consecutivos codifica:
+\begin{enumerate}
+    \item Cuatrimestre (0 a num\_semesters-1)
+    \item Día de la semana (0 a 4: Lunes-Viernes)
+    \item Turno (0-1: Mañana-Tarde)
+    \item Profesor asignado (implícito por materia)
+\end{enumerate}
+
+\subsubsection{Decodificación de partículas}
+El proceso de decodificación convierte el vector continuo de cada partícula en una asignación discreta:
+
+\begin{verbatim}
+def decode_solution(self, x):
+    sol = []
+    for i in range(self.num_subjects):
+        for cohort_idx in range(self.num_cohorts):
+            base = i*self.num_cohorts*4 + cohort_idx*4
+            semester = int(round(x[base])) % self.num_semesters
+            day = int(round(x[base+1])) % len(self.week_days)
+            shift = int(round(x[base+2])) % len(self.shifts)
+            prof = self.professor_by_subject[self.subjects[i]]
+            cohort = self.cohorts[cohort_idx]
+            sol.append((self.subjects[i], semester, prof, cohort, 
+                       self.week_days[day], self.shifts[shift]))
+    return sol
+\end{verbatim}
+
+\subsection{Función objetivo}
+
+La función objetivo implementa un sistema de penalizaciones ponderadas para evaluar la calidad de cada solución:
+
+\begin{verbatim}
+def objective(self, x):
+    sol = self.decode_solution(x)
+    penalty = 0
+    
+    # Estructuras de datos para analisis eficiente
+    cohort_semester_subjects = {}
+    professor_day_count = {}
+    cohort_day_count = {}
+    slot_usage = {}
+    
+    # Procesar solucion una sola vez
+    for subject, semester, professor, cohort, day, shift in sol:
+        # Verificar conflictos de horarios
+        slot_key = (cohort, semester, day, shift)
+        if slot_key in slot_usage:
+            penalty += self.penalty_weights['slot_conflicts']
+        
+        # Penalizar bloques bloqueados
+        if (day, shift) in self.blocked_slots:
+            penalty += self.penalty_weights['blocked_slots']
+        
+        # Contadores para sobrecarga
+        professor_day_count[(professor, day)] = \
+            professor_day_count.get((professor, day), 0) + 1
+        cohort_day_count[(cohort, day)] = \
+            cohort_day_count.get((cohort, day), 0) + 1
+    
+    # Evaluar restricciones especificas
+    penalty += self._evaluate_semester_distribution(cohort_semester_subjects)
+    penalty += self._evaluate_prerequisites(sol)
+    penalty += self._evaluate_professor_overload(professor_day_count)
+    penalty += self._evaluate_cohort_overload(cohort_day_count)
+    
+    return penalty
+\end{verbatim}
+
+\subsection{Evaluación de restricciones}
+
+\subsubsection{Evaluación de prerequisitos}
+La evaluación de prerequisitos asegura que las correlatividades se respeten temporalmente:
+
+\begin{verbatim}
+def _evaluate_prerequisites(self, sol):
+    penalty = 0
+    
+    for cohort in self.cohorts:
+        # Crear mapeo materia -> cuatrimestre
+        semester_dict = {}
+        for subject, semester, _, coh, _, _ in sol:
+            if coh == cohort:
+                semester_dict[subject] = semester
+        
+        # Verificar prerequisitos
+        for subject, prereq in self.prerequisites:
+            if subject in semester_dict and prereq in semester_dict:
+                subject_semester = semester_dict[subject]
+                prereq_semester = semester_dict[prereq]
+                
+                # El prerequisito debe estar en cuatrimestre ANTERIOR
+                if subject_semester <= prereq_semester:
+                    violation_severity = (prereq_semester - subject_semester + 1)
+                    penalty += self.penalty_weights['prerequisites'] * violation_severity
+    
+    return penalty
+\end{verbatim}
+
+\subsubsection{Distribución equilibrada por cuatrimestre}
+Se implementa una distribución flexible que permite variaciones controladas:
+
+\begin{verbatim}
+def _evaluate_semester_distribution(self, cohort_semester_subjects):
+    penalty = 0
+    
+    for cohort in self.cohorts:
+        subjects_per_semester = [0] * self.num_semesters
+        
+        # Contar materias por cuatrimestre
+        for semester in range(self.num_semesters):
+            key = (cohort, semester)
+            if key in cohort_semester_subjects:
+                subjects_per_semester[semester] = len(cohort_semester_subjects[key])
+        
+        # Distribucion ideal flexible
+        total_subjects = self.num_subjects
+        ideal_per_semester = total_subjects / self.num_semesters
+        min_per_semester = max(1, int(ideal_per_semester * 0.7))  # 70% minimo
+        max_per_semester = int(ideal_per_semester * 1.3)          # 130% maximo
+        
+        for count in subjects_per_semester:
+            if count < min_per_semester:
+                penalty += self.penalty_weights['semester_distribution'] * \
+                          (min_per_semester - count)
+            elif count > max_per_semester:
+                penalty += self.penalty_weights['semester_distribution'] * \
+                          (count - max_per_semester)
+    
+    return penalty
+\end{verbatim}
+
+\subsection{Implementación del algoritmo PSO}
+
+\subsubsection{Configuración del optimizador}
+El algoritmo utiliza la biblioteca PySwarms con parámetros optimizados:
+
+\begin{verbatim}
+def run_pso_optimizer(self):
+    self.logger.info(f'Initializing PSO with options: {self.pso_options}')
+    
+    optimizer = ps.single.GlobalBestPSO(
+        n_particles=self.n_particles,
+        dimensions=self.dim,
+        options=self.pso_options,
+        bounds=self.bounds
+    )
+    
+    cost, pos = optimizer.optimize(self.objective_pyswarms, 
+                                 iters=self.max_iters)
+    
+    self.convergencia = optimizer.cost_history
+    self.best_x = pos
+    return cost, pos, self.convergencia
+\end{verbatim}
+
+\subsubsection{Adaptación para PySwarms}
+Se implementa un wrapper para adaptar la función objetivo al formato requerido por PySwarms:
+
+\begin{verbatim}
+def objective_pyswarms(self, x):
+    """Wrapper para PySwarms que evalua multiples particulas."""
+    return np.array([self.objective(xi) for xi in x])
+\end{verbatim}
+
+\subsection{API REST y Frontend}
+
+\subsubsection{Backend con FastAPI}
+El backend expone la funcionalidad de optimización a través de una API REST:
+
+\begin{verbatim}
+@app.post("/course")
+def create_course(request: CourseRequest):
+    generator = CourseGenerator(
+        subjects=request.subjects,
+        prerequisites=request.prerequisites,
+        professors=request.professors,
+        cohorts=request.cohorts,
+        professor_by_subject=request.professor_by_subject,
+        num_years=request.num_years,
+        semesters_per_year=request.semesters_per_year,
+        # ... otros parametros
+    )
+    
+    cost, pos, convergence = generator.run_pso_optimizer()
+    solution = generator.get_solution()
+    
+    return {
+        "cost": cost,
+        "solution": solution,
+        "convergence": list(convergence)
+    }
+\end{verbatim}
+
+\subsubsection{Frontend con Streamlit}
+La interfaz web permite configuración interactiva y visualización de resultados:
+
+\begin{verbatim}
+# Cargar configuracion base
+with open("config_example.json", encoding="utf-8") as f:
+    config_example = json.load(f)
+
+# Configuracion de API
+api_url = f'{os.environ.get("COURSE_API_URL", "http://localhost:8000")}/course'
+
+# Interfaz de usuario para parametros
+st.sidebar.selectbox("Numero de cohortes", options=[1, 2, 3, 4, 5])
+st.sidebar.slider("Iteraciones PSO", min_value=100, max_value=2000)
+st.sidebar.slider("Numero de particulas", min_value=50, max_value=1000)
+\end{verbatim}
+
+\subsection{Experimentación y análisis}
+
+El sistema incluye herramientas para experimentación automatizada con diferentes configuraciones:
+
+\begin{verbatim}
+def run_experiment(config, pso_options, n_particles, max_iters, experiment_name):
+    generator = CourseGenerator(
+        subjects=config["subjects"],
+        prerequisites=config["prerequisites"],
+        # ... configuracion completa
+        pso_options=pso_options,
+        n_particles=n_particles,
+        max_iters=max_iters
+    )
+    
+    cost, position, convergence = generator.run_pso_optimizer()
+    
+    # Calcular metricas de performance
+    initial_cost = convergence[0]
+    final_cost = cost
+    improvement = initial_cost - final_cost
+    improvement_percent = (improvement / initial_cost * 100)
+    
+    return {
+        'experiment_name': experiment_name,
+        'initial_cost': initial_cost,
+        'final_cost': final_cost,
+        'improvement_percent': improvement_percent,
+        'convergence': convergence
+    }
+\end{verbatim}
+
+Esta arquitectura modular permite una fácil extensión y modificación de componentes individuales, facilitando la experimentación con diferentes estrategias de optimización y la incorporación de nuevas restricciones al problema.
