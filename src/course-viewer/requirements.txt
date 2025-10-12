@@ -1,0 +1,8 @@
+streamlit
+matplotlib
+numpy
+seaborn
+pandas
+pyswarms
+pydantic
+requests

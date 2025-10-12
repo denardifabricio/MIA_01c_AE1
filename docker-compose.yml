@@ -1,0 +1,31 @@
+services:
+  course-generator:
+    build:
+      context: src/course-generator
+      dockerfile: Dockerfile
+    ports:
+      - "${COURSE_GENERATOR_PORT}:${COURSE_GENERATOR_PORT}"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - COURSE_GENERATOR_PORT=${COURSE_GENERATOR_PORT}
+      - COURSE_VIEWER_PORT=${COURSE_VIEWER_PORT}
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:${COURSE_GENERATOR_PORT}/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+
+  course-viewer:
+    build:
+      context: src/course-viewer
+      dockerfile: Dockerfile
+    depends_on:
+      - course-generator
+    ports:
+      - "${COURSE_VIEWER_PORT}:${COURSE_VIEWER_PORT}"
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - COURSE_VIEWER_PORT=${COURSE_VIEWER_PORT}
+      - COURSE_API_URL=http://course-generator:${COURSE_GENERATOR_PORT}

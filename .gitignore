@@ -3,3 +3,8 @@ output_excel
 .venv/
 report.log
 .DS_Store
+.env
+logs
+
+analisis*.txt
+reporte*.txt

@@ -1,7 +1,7 @@
 {
   "latex-workshop.latex.rootFile.useSubFile": false,
   "latex-workshop.latex.rootFile.doNotPrompt": false,
-  "latex-workshop.latex.rootFile.default": "main.tex",
+  "latex-workshop.latex.rootFile.default": "MIA_c01_AE1.tex",
 
   "latex-workshop.latex.tools": [
     {
