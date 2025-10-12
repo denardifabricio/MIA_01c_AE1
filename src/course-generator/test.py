@@ -27,6 +27,21 @@ def prepare_professor_assignments(config):
             professor_assignments[subject] = professor
     return professor_assignments
 
+def get_mandatory_penalty_weights(config):
+    """Retornar pesos que hacen obligatorias las restricciones principales."""
+    # Obtener los pesos de penalización desde config si existen, sino usar valores por defecto
+    weights = config.get("penalty_weights", {})
+    return {
+        'semester_distribution': weights.get('semester_distribution', 1e12),
+        'prerequisites': weights.get('prerequisites', 1e11),
+        'blocked_slots': weights.get('blocked_slots', 1000),
+        'professor_overload': weights.get('professor_overload', 100),
+        'cohort_overload': weights.get('cohort_overload', 200),
+        'slot_conflicts': weights.get('slot_conflicts', 500),
+        'day_balance': weights.get('day_balance', 50),
+        'shift_usage': weights.get('shift_usage', 100)
+    }
+
 def print_solution_summary(solution, cost, convergence):
     """Imprimir un resumen de la solución."""
     print("\n" + "="*60)
@@ -289,7 +304,7 @@ def print_quality_analysis(generator, save_to_file=True):
         try:
             import datetime
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"analisis_calidad_{timestamp}.txt"
+            filename = f"report/analisis_calidad_{timestamp}.txt"
             
             with open(filename, 'w', encoding='utf-8') as f:
                 f.write("\n".join(analysis_content))
@@ -310,7 +325,7 @@ def generate_complete_report(config, generator, cost, convergence, solution, ana
     try:
         import datetime
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"reporte_completo_{timestamp}.txt"
+        filename = f"report/reporte_completo_{timestamp}.txt"
         
         with open(filename, 'w', encoding='utf-8') as f:
             # Encabezado del reporte
@@ -342,6 +357,19 @@ def generate_complete_report(config, generator, cost, convergence, solution, ana
             f.write(f"• w (inertia): {pso_options.get('w', 'default')}\n")
             f.write(f"• Partículas: {config.get('n_particles', 60)}\n")
             f.write(f"• Iteraciones máximas: {config.get('max_iters', 200)}\n")
+            
+            # Pesos de penalización utilizados
+            f.write(f"\nPESOS DE PENALIZACIÓN UTILIZADOS:\n")
+            f.write("-" * 40 + "\n")
+            penalty_weights = generator.penalty_weights if hasattr(generator, 'penalty_weights') else get_mandatory_penalty_weights(config)
+            f.write(f"• Distribución de cuatrimestres: {penalty_weights.get('semester_distribution', 'N/A')}\n")
+            f.write(f"• Prerequisitos: {penalty_weights.get('prerequisites', 'N/A')}\n")
+            f.write(f"• Bloques bloqueados: {penalty_weights.get('blocked_slots', 'N/A')}\n")
+            f.write(f"• Sobrecarga de profesores: {penalty_weights.get('professor_overload', 'N/A')}\n")
+            f.write(f"• Sobrecarga de cohortes: {penalty_weights.get('cohort_overload', 'N/A')}\n")
+            f.write(f"• Conflictos de horarios: {penalty_weights.get('slot_conflicts', 'N/A')}\n")
+            f.write(f"• Balance de días: {penalty_weights.get('day_balance', 'N/A')}\n")
+            f.write(f"• Uso de turnos: {penalty_weights.get('shift_usage', 'N/A')}\n")
             
             # Resultados de la optimización
             f.write(f"\nRESULTADOS DE LA OPTIMIZACIÓN:\n")
@@ -445,11 +473,15 @@ def main():
         professor_assignments = prepare_professor_assignments(config)
         blocked_slots = [tuple(slot) for slot in config["blocked_slots"]]
         
-        # Crear generador
+        # Crear generador con pesos obligatorios
         print("\n🔧 Inicializando generador...")
         print(f"   • Parámetros PSO: {config.get('pso_options', 'default')}")
         print(f"   • Partículas: {config.get('n_particles', 60)}")
         print(f"   • Iteraciones máximas: {config.get('max_iters', 200)}")
+        print("   • ⚠️  RESTRICCIONES OBLIGATORIAS: Distribución de semestres y Prerequisitos")
+        
+        # Usar pesos obligatorios que hacen estas restricciones críticas
+        mandatory_weights = get_mandatory_penalty_weights(config)
         
         generator = CourseGenerator(
             subjects=config["subjects"],
@@ -466,12 +498,10 @@ def main():
             week_days=config["week_days"],
             shifts=config["shifts"],
             blocked_slots=blocked_slots,
-            print_image_result=False,
-            print_excel_result=True,
             pso_options=config.get("pso_options"),
             n_particles=config.get("n_particles", 60),
-            max_iters=config.get("max_iters", 200),
-            penalty_weights=config.get("penalty_weights"),
+            max_iters=config.get("max_iters", 500),
+            penalty_weights=mandatory_weights, 
             logger=logger
         )
         

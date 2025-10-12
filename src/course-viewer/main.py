@@ -176,7 +176,12 @@ if submitted:
                 max_subjects_per_day_cohort=max_subjects_per_day_cohort,
                 week_days=week_days_list,
                 shifts=shifts_list,
-                blocked_slots=blocked_slots_list
+                blocked_slots=blocked_slots_list,
+                pso_options=config_example.get("pso_options"),
+                n_particles=config_example.get("n_particles", 60),
+                max_iters=config_example.get("max_iters", 500),
+                penalty_weights=config_example.get("penalty_weights"),
+
             )
             
             logger.info(f"Enviando datos a la API /course.: {course_request.model_dump()}")
@@ -243,6 +248,6 @@ if submitted:
                             # Llenar la grilla con las materias y profesores
                             for subject, prof, day, shift in subjects_in_semester:
                                 if day in grid.columns and shift in grid.index:
-                                    grid.at[shift, day] = f"{subject}\n{prof}"
+                                    grid.at[shift, day] += f"{subject}\n{prof}\n"
 
                             st.dataframe(grid, height=200)
