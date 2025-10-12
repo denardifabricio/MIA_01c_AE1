@@ -23,11 +23,12 @@ Los resultados de la optimización muestran una mejora significativa:
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{../output_imgs/convergencia_pso.png}
+    \includegraphics[width=0.8\textwidth]{../src/course-generator/convergencia_pso.png}
     \caption{Convergencia del algoritmo PSO durante la optimización}
     \label{fig:convergencia_pso}
 \end{figure}
 
+\newpage
 \subsection{Análisis de Calidad de la Solución}
 
 El análisis de calidad revela que la solución obtenida cumple satisfactoriamente con la mayoría de las restricciones establecidas:
@@ -92,33 +93,7 @@ El sistema generó calendarios visuales para cada cohorte y cuatrimestre, así c
 
 \subsubsection{Calendarios Consolidados por Cuatrimestre}
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_consolidado_cuatri1.png}
-    \hfill
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_consolidado_cuatri2.png}
-    
-    \vspace{0.5cm}
-    
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_consolidado_cuatri3.png}
-    \hfill
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_consolidado_cuatri4.png}
-    
-    \caption{Calendarios consolidados por cuatrimestre (arriba: Cuatri 1 y 2, abajo: Cuatri 3 y 4)}
-    \label{fig:calendarios_consolidados}
-\end{figure}
 
-\subsubsection{Ejemplos de Calendarios por Cohorte}
-
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_C1_anio2026_cuatri1.png}
-    \hfill
-    \includegraphics[width=0.45\textwidth]{../output_imgs/calendario_C2_anio2026_cuatri1.png}
-    
-    \caption{Calendarios específicos por cohorte para el primer cuatrimestre de 2026 (izq: Cohorte 1, der: Cohorte 2)}
-    \label{fig:calendarios_cohortes}
-\end{figure}
 
 \subsection{Asignación de Profesores}
 
@@ -162,6 +137,8 @@ Uno de los aspectos más críticos del calendario académico es el cumplimiento 
     \item \textbf{Finanzas Corporativas} se programa después de \textbf{Legislación}
 \end{itemize}
 
+
+\newpage
 \subsection{Calendario Detallado de Asignaciones}
 
 A continuación se presenta el calendario completo de asignaciones generado por el sistema:
@@ -211,7 +188,6 @@ Reaseguros & 4 & Prof. D & Cohorte2 & Jueves & Mañana \\
 Para complementar los resultados presentados, se ha preparado un video demostrativo que muestra el funcionamiento del sistema de optimización en tiempo real. En este video se puede observar la ejecución del algoritmo PSO, la generación de los calendarios académicos y la visualización de los resultados obtenidos.
 
 El video de la demostración está disponible en el siguiente enlace:
-
+\\[2em]
 \texttt{https://drive.google.com/file/d/1hGi3YIPN-MqoP5bTV9qtSm7yfmp70HfT/view?usp=sharing}
 
-Los resultados demuestran que el algoritmo PSO implementado es capaz de generar calendarios académicos de alta calidad que satisfacen las restricciones pedagógicas y administrativas del programa de Ciencias Actuariales, logrando un score de calidad del 90\% con una mejora del 99\% respecto al costo inicial.
