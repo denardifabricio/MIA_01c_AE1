@@ -12,6 +12,7 @@ El código fuente completo de este proyecto, incluyendo la implementación del a
 Este repositorio contiene todos los archivos necesarios para ejecutar el proyecto, incluyendo los datos de entrada, la implementación del algoritmo PSO, y los scripts para generar los calendarios y visualizaciones.
 
 \subsection*{Materias}
+La lista de materias que componen el programa de formación es la siguiente. Cada materia tiene una duración de un cuatrimestre y debe ser dictada en un máximo de 2 clases por semana.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|}
@@ -31,7 +32,10 @@ Reaseguros \\
 \caption{Listado de materias del programa}
 \end{table}
 
+\newpage
+
 \subsection*{Profesores}
+Los profesores son empleados de la aseguradora con experiencia en la materia que dictan. Por cuestiones de protección de datos, los nombres han sido anonimizado.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|}
@@ -68,17 +72,15 @@ Reaseguros & Prof. D \\
 \end{table}
 
 \subsection*{Cohortes}
+Dado la cantidad de alumnos inscriptos, se han formado dos cohortes que cursarán las materias de manera simultánea.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|}
 \hline
 	\textbf{Cohortes} \\
 \hline
-C1 \\
-C2 \\
-C3 \\
-C4 \\
-C5 \\
+Cohorte 1 \\
+Cohorte 2 \\
 \hline
 \end{tabular}
 \caption{Cohortes de empleados participantes}
@@ -112,23 +114,22 @@ El problema de programación de calendarios académicos presenta diversas restri
 Las restricciones fuertes son aquellas que \textbf{no pueden ser violadas} bajo ninguna circunstancia, ya que comprometen la factibilidad de la solución:
 
 \begin{itemize}
-    \item \textbf{Correlatividades (Prerequisites)}: Las materias deben respetar estrictamente el orden de correlatividades. Una materia no puede ser dictada en un cuatrimestre igual o anterior al de su correlativa.
-    \item \textbf{Conflictos de horarios}: No puede haber solapamiento de horarios para un mismo profesor o cohorte en un mismo día y turno.
-    \item \textbf{Bloques horarios prohibidos}: Ciertos días y turnos están bloqueados y no pueden ser utilizados para dictar clases.
+    \item \textbf{Correlatividades (Prerequisites)}: las materias deben respetar estrictamente el orden de correlatividades. Una materia no puede ser dictada en un cuatrimestre igual o anterior al de su correlativa.
+    \item \textbf{Conflictos de horarios}: no puede haber solapamiento de horarios para un mismo profesor o cohorte en un mismo día y turno.
+    \item \textbf{Bloques horarios prohibidos}: ciertos días y turnos están bloqueados y no pueden ser utilizados para dictar clases.
 \end{itemize}
 
 \subsubsection{Restricciones Débiles (Soft Constraints)}
 Las restricciones débiles pueden ser violadas, pero con penalizaciones en la función objetivo que afectan la calidad de la solución:
 
 \begin{itemize}
-    \item \textbf{Distribución equilibrada por cuatrimestre}: Se busca una distribución balanceada de materias entre los diferentes cuatrimestres del programa.
-    \item \textbf{Sobrecarga de profesores}: Los profesores no deberían tener más del máximo permitido de materias por día.
-    \item \textbf{Sobrecarga de cohortes}: Las cohortes no deberían tener más del máximo permitido de materias por día.
-    \item \textbf{Balance en el uso de días}: Se busca un uso equilibrado de todos los días de la semana disponibles.
-    \item \textbf{Uso eficiente de turnos}: Se prefiere el uso de todos los turnos disponibles en cada día.
+    \item \textbf{Distribución equilibrada por cuatrimestre}: se busca una distribución balanceada de materias entre los diferentes cuatrimestres del programa.
+    \item \textbf{Sobrecarga de profesores}: los profesores no deberían tener más del máximo permitido de materias por día.
+    \item \textbf{Sobrecarga de cohortes}: las cohortes no deberían tener más del máximo permitido de materias por día.
+    \item \textbf{Balance en el uso de días}: se busca un uso equilibrado de todos los días de la semana disponibles.
+    \item \textbf{Uso eficiente de turnos}: se prefiere el uso de todos los turnos disponibles en cada día.
 \end{itemize}
 
-\newpage
 \subsection{Estructura base del problema - Configuración de ejemplo}
 A continuación se presenta la estructura completa de configuración utilizada como base para el problema, incluyendo todos los parámetros de restricciones:
 
@@ -149,6 +150,7 @@ Clases máximas por semana & 2 & Frecuencia semanal por materia \\
 \end{table}
 
 \subsubsection{Restricciones de capacidad}
+Este programa tiene límites específicos en cuanto a la cantidad máxima de materias que pueden ser asignadas por día, tanto para profesores como para cohortes. Esto se debe a que los empleados tienen otras responsabilidades laborales y no pueden dedicar todo el día a clases.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|c|l|}
@@ -163,6 +165,7 @@ Materias por día (cohorte) & 2 & Restricción débil \\
 \end{table}
 
 \subsubsection{Horarios y turnos disponibles}
+Hay que considerar que los profesores son empleados de la aseguradora y tienen disponibilidad limitada. Por lo tanto, ciertos bloques horarios están prohibidos para la asignación de clases.
 \begin{table}[ht]
 \centering
 \begin{tabular}{|l|l|}
